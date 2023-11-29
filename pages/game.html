@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blackjack Game</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Welcome to Blackjack!</h1>
+
+        <div id="gameArea" style="display: none;">
+            <div>
+                <h2><span id="playerNameDisplay"></span>: <span id="playerFunds">$20</span></h2>
+                <h3>Bet Amount: <span id="betAmount">$0</span></h3>
+                <div>
+                    <button onclick="placeBet(1)">Bet $1</button>
+                    <button onclick="placeBet(5)">Bet $5</button>
+                    <button onclick="placeBet(10)">Bet $10</button>
+                    <button onclick="placeBet(25)">Bet $25</button>
+                    <button onclick="placeBet(100)">Bet $100</button>
+                    <button onclick="lockInBet()">Lock In</button>
+                </div>
+            </div>
+
+            <div>
+                <h2>Dealer</h2>
+                <div id="dealerCards"></div>
+                <div id="dealerScore"></div>
+            </div>
+
+            <div>
+                <h2>Player:</h2>
+                <div id="playerCards"></div>
+                <div id="playerScore"></div>
+                <div>
+                    <button id="hitBtn" onclick="playerTurn('hit')">Hit</button>
+                    <button id="standBtn" onclick="playerTurn('stand')">Stand</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultArea" style="display: none;">
+            <h2>Game Results</h2>
+            <div id="gameResult"></div>
+            <button onclick="withdrawFunds()">Withdraw Funds</button>
+        </div>
+
+    </div>
+
+    <script src="../scripts/game.js"></script>
+</body>
+</html>
