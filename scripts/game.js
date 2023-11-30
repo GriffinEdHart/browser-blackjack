@@ -51,6 +51,15 @@ function startGame() {
     document.getElementById('gameArea').style.display = 'block';
     document.getElementById('resultArea').style.display = 'none';
 
+    // Disable Hit and Stand buttons
+    const hitButton = document.getElementById('hitBtn');
+    hitButton.disabled = true;
+    hitButton.classList.add('disabled-button');
+
+    const standButton = document.getElementById('standBtn');
+    standButton.disabled = true;
+    standButton.classList.add('disabled-button');
+
     // Enable betting and lock-in buttons
     const betButtons = document.querySelectorAll('.bet-button');
     betButtons.forEach(button => {
@@ -132,6 +141,20 @@ function lockInBet() {
     lockInButton.disabled = true;
     lockInButton.classList.add('disabled-button');
 
+    // Disable the Reset Bet button
+    const resetBetButton = document.getElementById('resetBetBtn');
+    resetBetButton.disabled = true;
+    resetBetButton.classList.add('disabled-button');    
+
+    // Enable the Stand and Hit buttons
+    const standButton = document.getElementById('standBtn');
+    standButton.disabled = false;
+    standButton.classList.remove('disabled-button');
+
+    const hitButton = document.getElementById('hitBtn');
+    hitButton.disabled = false;
+    hitButton.classList.remove('disabled-button');
+
     // Deal initial cards to the player and dealer
     playerCards.push(dealCard(), dealCard());
     dealerCards.push(dealCard());
@@ -141,6 +164,15 @@ function lockInBet() {
     dealerScore = calculateScore([dealerCards[0]]); // Only calculate the score for the first card
 
     updateGameDisplay();
+}
+
+function resetBet() {
+    playerFunds += betAmount; // Refund the bet amount to player's funds
+    betAmount = 0;
+
+    // Update bet and funds display
+    document.getElementById('betAmount').textContent = '$' + betAmount;
+    document.getElementById('playerFunds').textContent = '$' + playerFunds;
 }
 
 
