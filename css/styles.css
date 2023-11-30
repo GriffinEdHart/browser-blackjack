@@ -90,3 +90,19 @@ button:hover {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+.howTo {
+    display: block;
+    padding: 8px 16px;
+    font-size: 14px;
+    margin-top: 20px;
+    border-radius: 4px;
+    background-color: #929292;
+    color: white;
+    text-decoration: none;
+    text-align: center;    
+}
+
+.howTo:hover {
+    background-color: #777777;
+}

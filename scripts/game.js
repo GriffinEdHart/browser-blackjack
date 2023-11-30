@@ -67,6 +67,10 @@ function startGame() {
         button.classList.remove('disabled-button'); // Remove disabled class if previously added
     });
 
+    const resetBetButton = document.getElementById('resetBetBtn');
+    resetBetButton.disabled = false;
+    resetBetButton.classList.remove('disabled-button');
+
     const lockInButton = document.getElementById('lockInBtn');
     lockInButton.disabled = false;
     lockInButton.classList.remove('disabled-button'); // Remove disabled class if previously added
