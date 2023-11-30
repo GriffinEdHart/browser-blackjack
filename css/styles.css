@@ -85,3 +85,8 @@ button:hover {
 .red-card {
     color: red;
 }
+
+.disabled-button {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

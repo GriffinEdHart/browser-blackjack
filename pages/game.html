@@ -8,19 +8,19 @@
 <body>
 
     <div class="container">
-        <h1>Welcome to Blackjack!</h1>
+        <h1 id="greeting">Welcome to Blackjack!</h1>
 
         <div id="gameArea" style="display: none;">
             <div>
                 <h2><span id="playerNameDisplay"></span>: <span id="playerFunds">$20</span></h2>
                 <h3>Bet Amount: <span id="betAmount">$0</span></h3>
                 <div>
-                    <button onclick="placeBet(1)">Bet $1</button>
-                    <button onclick="placeBet(5)">Bet $5</button>
-                    <button onclick="placeBet(10)">Bet $10</button>
-                    <button onclick="placeBet(25)">Bet $25</button>
-                    <button onclick="placeBet(100)">Bet $100</button>
-                    <button onclick="lockInBet()">Lock In</button>
+                    <button class="bet-button" onclick="placeBet(1)">Bet $1</button>
+                    <button class="bet-button" onclick="placeBet(5)">Bet $5</button>
+                    <button class="bet-button" onclick="placeBet(10)">Bet $10</button>
+                    <button class="bet-button" onclick="placeBet(25)">Bet $25</button>
+                    <button class="bet-button" onclick="placeBet(100)">Bet $100</button>
+                    <button id="lockInBtn" onclick="lockInBet()">Lock In</button>
                 </div>
             </div>
 
@@ -50,5 +50,16 @@
     </div>
 
     <script src="../scripts/game.js"></script>
+    <script>
+        // Retrieve player's name from local storage
+        let playerName = localStorage.getItem('playerName');
+        let greeting = document.getElementById('greeting');
+
+        if (playerName) {
+            greeting.textContent = `Welcome to Blackjack, ${playerName}!`;
+        } else {
+            greeting.textContent = 'Welcome to Blackjack!';
+        }
+    </script>
 </body>
 </html>

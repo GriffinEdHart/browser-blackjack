@@ -8,15 +8,16 @@ let playerScore = 0;
 let dealerScore = 0;
 let betAmount = 0;
 let playerBusted = false;
+let gameInProgress = false;
 
 // Retrieve player's name from local storage
-playerName = localStorage.getItem(playerName);
+playerName = localStorage.getItem('playerName'); // Use the correct key name 'playerName'
+
 let playerNameDisplay = document.getElementById('playerNameDisplay');
 
 if (playerName) {
     playerNameDisplay.textContent = playerName;
 } else {
-    // Handle the case where playerName is not found in localStorage
     playerNameDisplay.textContent = 'Player';
 }
 
@@ -27,6 +28,12 @@ startGame();
 function startGame() {
     deck = createDeck();
     shuffle(deck);
+
+    if (playerFunds === 0) {
+        alert('You lose! Restarting the game...');
+        window.location.reload(); // Refresh the page after the alert is closed
+        return; // Prevent the game from starting
+    }
 
     betAmount = 0;
     playerCards = [];
@@ -43,6 +50,20 @@ function startGame() {
     updateGameDisplay();
     document.getElementById('gameArea').style.display = 'block';
     document.getElementById('resultArea').style.display = 'none';
+
+    // Enable betting and lock-in buttons
+    const betButtons = document.querySelectorAll('.bet-button');
+    betButtons.forEach(button => {
+        button.disabled = false;
+        button.classList.remove('disabled-button'); // Remove disabled class if previously added
+    });
+
+    const lockInButton = document.getElementById('lockInBtn');
+    lockInButton.disabled = false;
+    lockInButton.classList.remove('disabled-button'); // Remove disabled class if previously added
+
+    // Update game status
+    gameInProgress = false;
 }
 
 // Function to create a deck of cards
@@ -99,6 +120,18 @@ function lockInBet() {
         return;
     }
 
+    // Disable bet buttons
+    const betButtons = document.querySelectorAll('.bet-button');
+    betButtons.forEach(button => {
+        button.disabled = true;
+        button.classList.add('disabled-button');
+    });
+
+    // Disable Lock In button
+    const lockInButton = document.getElementById('lockInBtn');
+    lockInButton.disabled = true;
+    lockInButton.classList.add('disabled-button');
+
     // Deal initial cards to the player and dealer
     playerCards.push(dealCard(), dealCard());
     dealerCards.push(dealCard());
@@ -126,11 +159,15 @@ function playerTurn(action) {
         playerCards.push(dealCard());
         playerScore = calculateScore(playerCards); // Update player score.
         updateGameDisplay();
-        if (playerScore > 21) {
+        if (playerScore === 21) {
+            action = 'stand'; // Force the player to stand if they reach 21
+        } else if (playerScore > 21) {
             playerBusted = true;
             determineWinners();
         }
-    } else if (action === 'stand') {
+    }
+
+    if (action === 'stand') {
         if (betAmount === 0) {
             alert('Please place a bet first.');
             return;
@@ -140,8 +177,9 @@ function playerTurn(action) {
         while (dealerScore < 17) {
             dealerCards.push(dealCard());
             dealerScore = calculateScore(dealerCards);
+            updateGameDisplay(); // Display dealer's cards as they draw
         }
-        
+
         determineWinners();
         updateGameDisplay(); // Update the game display after the dealer's turn
     }
@@ -208,17 +246,23 @@ function updateGameDisplay() {
         `<div class="card ${card.suit === '♥' || card.suit === '♦' ? 'red-card' : ''}">${card.value}${card.suit}</div>`).join('');
 
     // Displaying the dealer's cards
-    document.getElementById('dealerCards').innerHTML = '';
+    const dealerCardsDisplay = document.getElementById('dealerCards');
+    dealerCardsDisplay.innerHTML = '';
     if (dealerCards.length > 0) {
-        // Show the first card face up and the rest face down
-        document.getElementById('dealerCards').innerHTML =
-            `<div class="card">${dealerCards[0].value}${dealerCards[0].suit}</div>` +
-            `<div class="card hidden">${dealerCards.slice(1).map(card => `${card.value}${card.suit}`).join('')}</div>`;
+        // Show all dealer cards
+        const dealerCardsToShow = dealerCards.map((card, index) => {
+            if (index === 0) {
+                return `<div class="card">${card.value}${card.suit}</div>`;
+            } else {
+                return `<div class="card">${card.value}${card.suit}</div>`;
+            }
+        }).join('');
+        dealerCardsDisplay.innerHTML = dealerCardsToShow;
     }
 
     // Update scores
     document.getElementById('playerScore').textContent = `Player Score: ${playerScore}`;
-    document.getElementById('dealerScore').textContent = `Dealer Score: ${playerBusted ? dealerScore : dealerCards.length === 2 ? calculateScore([dealerCards[1]]) : calculateScore(dealerCards)}`;
+    document.getElementById('dealerScore').textContent = `Dealer Score: ${dealerScore}`;
 }
 
 
@@ -230,9 +274,12 @@ function dealerTurn() {
         alert('Please place a bet first.');
         return;
     }
+    
     function drawDealerCard() {
         dealerCards.push(dealCard());
-        updateGameDisplay();
+        dealerScore = calculateScore(dealerCards); // Update dealer score
+        updateGameDisplay(); // Update the game display with each draw
+        
         if (dealerScore < 17) {
             setTimeout(drawDealerCard, 500); // Add a slight delay between each card draw
         } else {
@@ -242,22 +289,24 @@ function dealerTurn() {
     drawDealerCard();
 }
 
-
+function withdrawFunds() {
+    startGame(); // Restart the game when the button is pressed (instead of waiting for the 5 second timer.)
+}
 
 // Function to determine winners and display results
 function determineWinners() {
     document.getElementById('resultArea').style.display = 'block';
     let result = '';
 
-    if (playerScore > 21) {
+    if (playerScore === 21 && playerCards.length === 2) {
+        result = 'Blackjack! Player wins!'
+        playerFunds += (betAmount * 1.5) + betAmount; // 1.5 times the bet as winnings, then returning the original amount bet.
+    } else if (playerScore > 21) {
         result = 'Player busts. Dealer wins.';
         if (playerFunds === 0) {
             result += ' You have no more funds.';
             setTimeout(startGame, 1000); // Restart the game after 1 second if player has no funds
         }
-    } else if (playerScore === 21 && playerCards.length === 2) {
-        result = 'Blackjack! Player wins!'
-        playerFunds += (betAmount * 1.5) + betAmount; // 1.5 times the bet as winnings, then returning the original amount bet.
     } else if (dealerScore > 21) {
         result = 'Dealer busts. Player wins!';
         playerFunds += betAmount * 2;
@@ -270,13 +319,10 @@ function determineWinners() {
     } else {
         result = 'Dealer wins.';
     }
-
+    // Update the result display
     document.getElementById('gameResult').textContent = result;
     document.getElementById('playerFunds').textContent = '$' + playerFunds;
 
-    if (playerFunds === 0) {
-        setTimeout(startGame, 5000); // Restart the game after 2 seconds if player has no funds
-    } else {
-        setTimeout(startGame, 5000); // Restart the game if playerFunds are NOT zero.
-    }
+    // Restart the game
+    // setTimeout(startGame, 5000); // Restart the game after 5 seconds
 }
